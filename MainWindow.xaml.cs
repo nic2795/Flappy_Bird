@@ -16,9 +16,6 @@ using System.Windows.Threading;
 
 namespace Flappy_Bird
 {
-    /// <summary>
-    /// Interaktionslogik für MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         DispatcherTimer gameTimer = new DispatcherTimer();
@@ -26,14 +23,12 @@ namespace Flappy_Bird
         double score;
         bool gameover = false;
 
-        // new rect class to help us detect collisions
         Rect FlappyRect;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            // set the default settings for the timer
             gameTimer.Tick += gameEngine;
             gameTimer.Interval = TimeSpan.FromMilliseconds(20);
 
@@ -43,68 +38,45 @@ namespace Flappy_Bird
         private void gameEngine(object sender, EventArgs e)
 
         {
-            // this is the game engine event linked to the timer
-            // first update the score text label with the score integer
             scoreText.Content = "Score: " + score;
-            // link the flappy bird image to the flappy rect class
             FlappyRect = new Rect(Canvas.GetLeft(flappyBird), Canvas.GetTop(flappyBird), flappyBird.Width - 12, flappyBird.Height - 6);
-            // set the gravity to the flappy bird image in the canvas
             Canvas.SetTop(flappyBird, Canvas.GetTop(flappyBird) + gravity);
-            // check if the bird has either gone off the screen from top or bottom
             if (Canvas.GetTop(flappyBird) + flappyBird.Height > 490 || Canvas.GetTop(flappyBird) < -20)
             {
                 EndGame();
             }
-            // below is the main loop, this loop will go through each image in the canvas
-            // if it finds any image with the tags and follow the instructions with them
+
             foreach (var x in MyCanvas.Children.OfType<Image>())
             {
                 if ((string)x.Tag == "obs1" || (string)x.Tag == "obs2" || (string)x.Tag == "obs3")
                 {
-                    // if we found an image with the tag obs1,2 or 3 then we will move it towards left of the scree
                     Canvas.SetLeft(x, Canvas.GetLeft(x) - 5);
-                    // create a new rect called pillars and link the rectangles to it
                     Rect pillars = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
-                    // if the flappy rect and the pillars rect collide
                     if (FlappyRect.IntersectsWith(pillars))
                     {
                         EndGame();
                     }
                 }
-                // if the first layer of pipes leave the scene and go to -100 pixels from the left
-                // we need to reset the pipe to come back again
                 if ((string)x.Tag == "obs1" && Canvas.GetLeft(x) < -100)
                 {
-                    // reset the pipe to 800 pixels
                     Canvas.SetLeft(x, 800);
-                    // add 1 to the score
                     score = score + .5;
                 }
-                // if the second layer of pipes leave the scene and go to -200 pixels from the left
                 if ((string)x.Tag == "obs2" && Canvas.GetLeft(x) < -200)
                 {
-                    // we set that pipe to 800 pixels
                     Canvas.SetLeft(x, 800);
-                    // add 1 to the score
                     score = score + .5;
                 }
-                // if the third layer of pipes leave the scene and go to -250 pixels from the left
                 if ((string)x.Tag == "obs3" && Canvas.GetLeft(x) < -250)
                 {
-                    // we set the pipe to 800 pixels
                     Canvas.SetLeft(x, 800);
-                    // add 1 to the score
                     score = score + .5;
                 }
-                // if find any of the images with the clouds tag on it
                 if ((string)x.Tag == "clouds")
                 {
-                    // then we will slowly move the cloud towards left of the screen
                     Canvas.SetLeft(x, Canvas.GetLeft(x) - .6);
-                    // if the clouds have reached -220 pixels then we will reset it
                     if (Canvas.GetLeft(x) < -220)
                     {
-                        // reset the cloud images to 550 pixels
                         Canvas.SetLeft(x, 550);
                     }
                 }
